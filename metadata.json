@@ -1,0 +1,6 @@
+{
+  "name": "voox123 - Futuristic 3D Fashion E-Commerce",
+  "description": "Award-winning, futuristic 3D cyberpunk fashion e-commerce showroom for VOOX premium luxury streetwear.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
