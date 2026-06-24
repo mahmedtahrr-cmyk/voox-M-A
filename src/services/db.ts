@@ -28,7 +28,7 @@ const SAMPLE_PRODUCTS: Product[] = [
     featured: true,
     created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     product_images: [
-      { id: '11111111-1111-4111-8111-999999999991', product_id: '11111111-1111-4111-8111-111111111111', image_url: '/src/assets/images/void_hoodie_1779875252715.png' }
+      { id: '11111111-1111-4111-8111-999999999991', product_id: '11111111-1111-4111-8111-111111111111', image_url: '/images/void_hoodie_1779875252715.png' }
     ],
     product_sizes: [
       { id: '11111111-1111-4111-8111-888888888881', product_id: '11111111-1111-4111-8111-111111111111', size: 'S', quantity: 4 },
@@ -49,7 +49,7 @@ const SAMPLE_PRODUCTS: Product[] = [
     featured: true,
     created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     product_images: [
-      { id: '22222222-2222-4222-8222-999999999991', product_id: '22222222-2222-4222-8222-222222222222', image_url: '/src/assets/images/glitch_tshirt_1779875272702.png' }
+      { id: '22222222-2222-4222-8222-999999999991', product_id: '22222222-2222-4222-8222-222222222222', image_url: '/images/glitch_tshirt_1779875272702.png' }
     ],
     product_sizes: [
       { id: '22222222-2222-4222-8222-888888888881', product_id: '22222222-2222-4222-8222-222222222222', size: 'S', quantity: 6 },
@@ -70,7 +70,7 @@ const SAMPLE_PRODUCTS: Product[] = [
     featured: true,
     created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     product_images: [
-      { id: '33333333-3333-4333-8333-999999999991', product_id: '33333333-3333-4333-8333-333333333333', image_url: '/src/assets/images/hero_hoodie_1779875229508.png' }
+      { id: '33333333-3333-4333-8333-999999999991', product_id: '33333333-3333-4333-8333-333333333333', image_url: '/images/hero_hoodie_1779875229508.png' }
     ],
     product_sizes: [
       { id: '33333333-3333-4333-8333-888888888881', product_id: '33333333-3333-4333-8333-333333333333', size: 'M', quantity: 4 },
@@ -91,7 +91,7 @@ const SAMPLE_PRODUCTS: Product[] = [
     featured: true,
     created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     product_images: [
-      { id: '44444444-4444-4444-8444-999999999991', product_id: '44444444-4444-4444-8444-444444444444', image_url: '/src/assets/images/tech_jacket_1779875291017.png' }
+      { id: '44444444-4444-4444-8444-999999999991', product_id: '44444444-4444-4444-8444-444444444444', image_url: '/images/tech_jacket_1779875291017.png' }
     ],
     product_sizes: [
       { id: '44444444-4444-4444-8444-888888888881', product_id: '44444444-4444-4444-8444-444444444444', size: 'S', quantity: 2 },
@@ -112,7 +112,7 @@ const SAMPLE_PRODUCTS: Product[] = [
     featured: true,
     created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     product_images: [
-      { id: '55555555-5555-4555-8555-999999999991', product_id: '55555555-5555-4555-8555-555555555555', image_url: '/src/assets/images/cargo_pants_1779875313014.png' }
+      { id: '55555555-5555-4555-8555-999999999991', product_id: '55555555-5555-4555-8555-555555555555', image_url: '/images/cargo_pants_1779875313014.png' }
     ],
     product_sizes: [
       { id: '55555555-5555-4555-8555-888888888881', product_id: '55555555-5555-4555-8555-555555555555', size: 'M', quantity: 5 },
@@ -261,7 +261,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
       .select('*, product_images(*), product_sizes(*), categories(*)');
     
     if (error) throw error;
-    if (data && data.length > 0) {
+    if (data && data.length >= 5) {
       // Massage format to fit Product type
       return data.map((item: any) => ({
         ...item,
@@ -271,17 +271,16 @@ export const fetchProducts = async (): Promise<Product[]> => {
         product_sizes: item.product_sizes || []
       })) as Product[];
     } else {
-      // Seed products if empty
-      console.log('Seeding initial products to Supabase...');
-      for (const prod of SAMPLE_PRODUCTS) {
-        // Insert product
+      // Seed products if empty or incomplete
+      const existingIds = new Set((data || []).map((p: any) => p.id));
+      const missingProds = SAMPLE_PRODUCTS.filter(p => !existingIds.has(p.id));
+      console.log(`Seeding ${missingProds.length} missing products to Supabase...`);
+      for (const prod of missingProds) {
         const { id, title, slug, description, price, discount_price, category_id, stock, gender, featured } = prod;
         const productPayload = { id, title, slug, description, price, discount_price, category_id, stock, gender, featured };
-        console.log('INSERT DATA (products):', productPayload);
         const { error: pErr } = await supabase.from('products').insert(productPayload);
         if (pErr) console.error('SUPABASE ERROR (products):', pErr);
         
-        // Insert images
         if (prod.product_images) {
           for (const img of prod.product_images) {
             const imgPayload = { id: img.id, product_id: img.product_id, image_url: img.image_url };
@@ -290,7 +289,6 @@ export const fetchProducts = async (): Promise<Product[]> => {
           }
         }
         
-        // Insert sizes
         if (prod.product_sizes) {
           for (const size of prod.product_sizes) {
             const sizePayload = { id: size.id, product_id: size.product_id, size: size.size, quantity: size.quantity };
@@ -299,7 +297,6 @@ export const fetchProducts = async (): Promise<Product[]> => {
           }
         }
       }
-      // Reload page to reflect seeded data perfectly
       return SAMPLE_PRODUCTS;
     }
   } catch (err) {
