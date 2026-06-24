@@ -226,24 +226,11 @@ export const fetchCategories = async (): Promise<Category[]> => {
   try {
     const { data, error } = await supabase.from('categories').select('*').order('name');
     if (error) throw error;
-    if (data && data.length > 0) {
+    if (data && data.length >= 5) {
       return data;
-    } else {
-      // Seed categories if empty
-      console.log('Seeding initial categories to Supabase...');
-      for (const cat of SAMPLE_CATEGORIES) {
-        const payload = {
-          id: cat.id,
-          name: cat.name,
-          slug: cat.slug,
-          image_url: cat.image_url
-        };
-        console.log('INSERT DATA (categories):', payload);
-        const { error } = await supabase.from('categories').insert(payload);
-        if (error) console.error('SUPABASE ERROR (categories):', error);
-      }
-      return SAMPLE_CATEGORIES;
     }
+    // Fallback to local if Supabase has incomplete data
+    return getLocalStorageDB().categories;
   } catch (err) {
     console.warn('Categories from micro-service unavailable; using cache:', err);
   }
@@ -262,43 +249,29 @@ export const fetchProducts = async (): Promise<Product[]> => {
     
     if (error) throw error;
     if (data && data.length >= 5) {
-      // Massage format to fit Product type
       return data.map((item: any) => ({
         ...item,
-        name: item.title, // compatibility fallback for legacy .name references
+        name: item.title,
         category: item.categories,
         product_images: item.product_images || [],
         product_sizes: item.product_sizes || []
       })) as Product[];
-    } else {
-      // Seed products if empty or incomplete
-      const existingIds = new Set((data || []).map((p: any) => p.id));
-      const missingProds = SAMPLE_PRODUCTS.filter(p => !existingIds.has(p.id));
-      console.log(`Seeding ${missingProds.length} missing products to Supabase...`);
-      for (const prod of missingProds) {
-        const { id, title, slug, description, price, discount_price, category_id, stock, gender, featured } = prod;
-        const productPayload = { id, title, slug, description, price, discount_price, category_id, stock, gender, featured };
-        const { error: pErr } = await supabase.from('products').insert(productPayload);
-        if (pErr) console.error('SUPABASE ERROR (products):', pErr);
-        
-        if (prod.product_images) {
-          for (const img of prod.product_images) {
-            const imgPayload = { id: img.id, product_id: img.product_id, image_url: img.image_url };
-            const { error: iErr } = await supabase.from('product_images').insert(imgPayload);
-            if (iErr) console.error('SUPABASE ERROR (product_images):', iErr);
-          }
-        }
-        
-        if (prod.product_sizes) {
-          for (const size of prod.product_sizes) {
-            const sizePayload = { id: size.id, product_id: size.product_id, size: size.size, quantity: size.quantity };
-            const { error: sErr } = await supabase.from('product_sizes').insert(sizePayload);
-            if (sErr) console.error('SUPABASE ERROR (product_sizes):', sErr);
-          }
-        }
-      }
-      return SAMPLE_PRODUCTS;
     }
+    // If DB has some but not all seed products, merge local fallback + remote
+    if (data && data.length > 0) {
+      const remoteIds = new Set(data.map((p: any) => p.id));
+      const local = getLocalStorageDB().products;
+      const merged = [...data.map((item: any) => ({
+        ...item,
+        name: item.title,
+        category: item.categories,
+        product_images: item.product_images || [],
+        product_sizes: item.product_sizes || []
+      })), ...local.filter(p => !remoteIds.has(p.id))] as Product[];
+      return merged;
+    }
+    // DB is empty — use local storage fallback
+    return getLocalStorageDB().products;
   } catch (err) {
     console.warn('Database Products query fallen back:', err);
   }
