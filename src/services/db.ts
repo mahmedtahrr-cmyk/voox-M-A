@@ -217,44 +217,52 @@ function saveLocalStorageDB(db: { products: Product[]; categories: Category[]; o
   localStorage.setItem('voox_orders', JSON.stringify(minifiedOrders));
 }
 
-// DATABASE INTERACTION METHODS — INSTANT LOCAL FIRST + BACKGROUND SUPABASE SYNC
+// DATABASE INTERACTION METHODS — INSTANT LOCAL + FAST SUPABASE WITH TIMEOUT
 
-let _syncPromise: Promise<void> | null = null;
-
-function syncFromSupabase() {
-  if (!hasRealSupabase || _syncPromise) return;
-  _syncPromise = (async () => {
-    try {
-      const [catResult, prodResult] = await Promise.all([
-        supabase.from('categories').select('*').order('name'),
-        supabase.from('products').select('*, product_images(*), product_sizes(*), categories(*)'),
-      ]);
-
-      if (catResult.data && catResult.data.length >= 5) {
-        localStorage.setItem('voox_categories', JSON.stringify(catResult.data));
+export const fetchCategories = async (): Promise<Category[]> => {
+  const local = getLocalStorageDB().categories;
+  if (!hasRealSupabase) return local;
+  return new Promise<Category[]>(resolve => {
+    let done = false;
+    const timer = setTimeout(() => { done = true; resolve(local); }, 3000);
+    supabase.from('categories').select('*').order('name').then(({ data, error }: any) => {
+      clearTimeout(timer);
+      if (!done) {
+        done = true;
+        if (!error && data && data.length >= 5) resolve(data);
+        else resolve(local);
       }
-      if (prodResult.data && prodResult.data.length >= 5) {
-        localStorage.setItem('voox_products', JSON.stringify(prodResult.data.map((item: any) => ({
-          ...item,
-          name: item.title,
-          category: item.categories,
-          product_images: item.product_images || [],
-          product_sizes: item.product_sizes || []
-        }))));
-      }
-      window.dispatchEvent(new CustomEvent('voox-sync'));
-    } catch {}
-  })();
-}
-
-export const fetchCategories = (): Category[] => {
-  syncFromSupabase();
-  return getLocalStorageDB().categories;
+    });
+  });
 };
 
-export const fetchProducts = (): Product[] => {
-  syncFromSupabase();
-  return getLocalStorageDB().products;
+export const fetchProducts = async (): Promise<Product[]> => {
+  const local = getLocalStorageDB().products;
+  if (!hasRealSupabase) return local;
+  return new Promise<Product[]>(resolve => {
+    let done = false;
+    const timer = setTimeout(() => { done = true; resolve(local); }, 3000);
+    supabase.from('products').select('*, product_images(*), product_sizes(*), categories(*)').then(({ data, error }: any) => {
+      clearTimeout(timer);
+      if (done) return;
+      done = true;
+      if (!error && data && data.length >= 5) {
+        resolve(data.map((item: any) => ({
+          ...item, name: item.title, category: item.categories,
+          product_images: item.product_images || [],
+          product_sizes: item.product_sizes || []
+        })) as Product[]);
+      } else if (!error && data && data.length > 0 && local.length >= 5) {
+        const remoteIds = new Set(data.map((p: any) => p.id));
+        resolve([
+          ...data.map((item: any) => ({ ...item, name: item.title, category: item.categories, product_images: item.product_images || [], product_sizes: item.product_sizes || [] })),
+          ...local.filter(p => !remoteIds.has(p.id)),
+        ] as Product[]);
+      } else {
+        resolve(local);
+      }
+    });
+  });
 };
 
 export const createProduct = async (productData: Partial<Product>, sizes: string[], imageUrl: string | null): Promise<Product> => {
