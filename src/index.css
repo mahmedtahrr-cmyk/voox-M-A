@@ -6,40 +6,107 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-body {
-  background-color: #000000 !important;
-  color: #fafafa !important;
-  font-family: var(--font-sans);
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --text-primary: #111111;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+  --border-strong: #9ca3af;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --card-hover-border: #9ca3af;
+  --scrollbar-track: #f3f4f6;
+  --scrollbar-thumb: #d1d5db;
+  --scrollbar-thumb-hover: #9ca3af;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-color: #111111;
+  --accent: #dc2626;
+  --accent-hover: #b91c1c;
+  --header-bg: rgba(255, 255, 255, 0.85);
+  --header-border: #e5e7eb;
+  --hero-text: #111111;
+  --section-bg: #ffffff;
+  --section-border: #e5e7eb;
+  --footer-bg: #f9fafb;
+  --footer-text: #6b7280;
+  --tape-color: #dc2626;
+  --product-card-bg: #ffffff;
+  --product-card-border: #e5e7eb;
+  --badge-bg: #f3f4f6;
+  --badge-text: #6b7280;
+  --blur-glow: rgba(220, 38, 38, 0.08);
 }
 
-/* Custom premium scrollbar styling in high-contrast neon red */
+.dark {
+  --bg-primary: #000000;
+  --bg-secondary: #09090b;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border-primary: #27272a;
+  --border-secondary: #3f3f46;
+  --border-strong: #52525b;
+  --card-bg: #000000;
+  --card-border: #27272a;
+  --card-hover-border: #52525b;
+  --scrollbar-track: #000000;
+  --scrollbar-thumb: #222222;
+  --scrollbar-thumb-hover: #ffffff;
+  --input-bg: #000000;
+  --input-border: #333333;
+  --input-color: #ffffff;
+  --header-bg: rgba(0, 0, 0, 0.4);
+  --header-border: #27272a;
+  --hero-text: #ffffff;
+  --section-bg: transparent;
+  --section-border: #27272a;
+  --footer-bg: #000000;
+  --footer-text: #71717a;
+  --tape-color: #dc2626;
+  --product-card-bg: rgba(0, 0, 0, 0.6);
+  --product-card-border: #27272a;
+  --badge-bg: #18181b;
+  --badge-text: #a1a1aa;
+  --blur-glow: rgba(220, 38, 38, 0.08);
+}
+
+body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom premium scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #222222;
+  background: var(--scrollbar-thumb);
   border-radius: 99px;
-  border: 1px solid #333333;
+  border: 1px solid var(--border-primary);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ffffff;
+  background: var(--scrollbar-thumb-hover);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
-/* Selection background color styling */
 ::selection {
   background-color: #ff1111 !important;
   color: #000000 !important;
 }
 
-/* Hollow skeletal heading typography style matching VOOX mockup graphic overlays */
 .outline-text {
   color: transparent;
   -webkit-text-stroke: 1px #ff1e1e;
@@ -51,28 +118,26 @@ body {
   transition: all 0.4s ease;
 }
 
-/* Dynamic glowing border and backdrops */
 .cyber-glow-border {
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: var(--border-primary) !important;
 }
 .cyber-glow-border:hover {
-  border-color: rgba(255, 255, 255, 0.4) !important;
+  border-color: var(--border-secondary) !important;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
 }
 
-/* Minimal input override to be pitch black with cyber white focus */
 input, select, textarea {
-  background-color: #000000 !important;
-  border-color: #333333 !important;
-  color: #ffffff !important;
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--input-color) !important;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: #ffffff !important;
+  border-color: var(--accent) !important;
   outline: none !important;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.25) !important;
 }
 
-/* Micro animations */
 @keyframes shimmer {
   0% {
     top: -100%;

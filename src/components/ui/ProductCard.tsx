@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Product } from '../../types';
 import { useCart } from '../../context/CartContext';
+import { useTheme } from '../../context/ThemeContext';
 import { ShoppingCart, Eye, Plus } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ProductCard3DOverlay } from '../3d/ProductCard3DOverlay';
@@ -12,6 +13,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
   const { addToCart } = useCart();
+  const { isDark } = useTheme();
   const [hovered, setHovered] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
@@ -51,9 +53,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
       style={{
         transform: `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
       }}
-      className={`relative rounded-xl border p-4 flex flex-col justify-between transition-all duration-300 pointer-events-auto bg-black/60 border-zinc-900 group content-box cursor-pointer select-none ${
+      className={`relative rounded-xl border p-4 flex flex-col justify-between transition-all duration-300 pointer-events-auto group content-box cursor-pointer select-none ${
+        isDark
+          ? 'bg-black/60 border-zinc-900'
+          : 'bg-white border-gray-200'
+      } ${
         hovered 
-          ? 'border-zinc-700 shadow-[0_0_30px_rgba(255,255,255,0.05)] bg-black/80' 
+          ? isDark
+            ? 'border-zinc-700 shadow-[0_0_30px_rgba(255,255,255,0.05)] bg-black/80'
+            : 'border-gray-300 shadow-[0_0_20px_rgba(0,0,0,0.06)] bg-gray-50'
           : ''
       }`}
       onClick={() => onQuickView(product)}
@@ -65,7 +73,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
             LIMITED
           </span>
         ) : (
-          <span className="px-2.5 py-0.5 bg-zinc-900/80 border border-zinc-800 text-[8px] font-mono tracking-widest text-zinc-400 rounded">
+          <span className={`px-2.5 py-0.5 border text-[8px] font-mono tracking-widest rounded transition-colors duration-300 ${
+            isDark
+              ? 'bg-zinc-900/80 border-zinc-800 text-zinc-400'
+              : 'bg-gray-100 border-gray-200 text-gray-500'
+          }`}>
             VX_CORE
           </span>
         )}
@@ -76,7 +88,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
       </div>
 
       {/* Main image container with futuristic glowing white frame */}
-      <div className="w-full h-80 flex items-center justify-center p-4 relative overflow-hidden bg-black/40 rounded-lg border-2 border-zinc-900 group-hover:border-white shadow-none transition-all duration-300">
+      <div className={`w-full h-80 flex items-center justify-center p-4 relative overflow-hidden rounded-lg border-2 shadow-none transition-all duration-300 ${
+        isDark
+          ? 'bg-black/40 border-zinc-900 group-hover:border-white'
+          : 'bg-gray-50 border-gray-200 group-hover:border-gray-400'
+      }`}>
         {/* Real-time 3D Hologram Background system */}
         <ProductCard3DOverlay isHovered={hovered} />
 
@@ -96,7 +112,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
         <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           <div className="flex gap-1">
             {sizeTags.map((size) => (
-              <span key={size} className="w-6 h-6 flex items-center justify-center text-[9px] bg-black/80 border border-zinc-800 font-mono text-zinc-300 rounded font-semibold">
+              <span key={size} className={`w-6 h-6 flex items-center justify-center text-[9px] border font-mono rounded font-semibold transition-colors duration-300 ${
+                isDark
+                  ? 'bg-black/80 border-zinc-800 text-zinc-300'
+                  : 'bg-white border-gray-200 text-gray-600'
+              }`}>
                 {size}
               </span>
             ))}
@@ -108,7 +128,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
       <div className="mt-4 pt-1 flex flex-col gap-2 relative">
         <div className="flex items-start justify-between gap-1">
           <div>
-            <h3 className="font-sans font-black text-sm tracking-widest text-white group-hover:text-zinc-300 transition-colors duration-300">
+            <h3 className={`font-sans font-black text-sm tracking-widest transition-colors duration-300 ${
+              isDark ? 'text-white group-hover:text-zinc-300' : 'text-gray-900 group-hover:text-gray-600'
+            }`}>
               {product.title}
             </h3>
             <p className="font-mono text-[9px] text-zinc-500 tracking-wider uppercase mt-1">
@@ -116,7 +138,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
             </p>
           </div>
           <div className="text-right">
-            <p className="font-mono text-xs font-bold text-white tracking-widest">
+            <p className={`font-mono text-xs font-bold tracking-widest transition-colors duration-300 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
               EGP {product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
@@ -129,7 +153,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
               e.stopPropagation();
               onQuickView(product);
             }}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-black hover:bg-zinc-900 border border-zinc-900 text-[10px] font-mono tracking-widest text-zinc-400 hover:text-white rounded-lg transition-all"
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 border text-[10px] font-mono tracking-widest rounded-lg transition-all ${
+              isDark
+                ? 'bg-black hover:bg-zinc-900 border-zinc-900 text-zinc-400 hover:text-white'
+                : 'bg-white hover:bg-gray-100 border-gray-200 text-gray-500 hover:text-gray-800'
+            }`}
           >
             <Eye className="w-3.5 h-3.5" />
             SHOWROOM

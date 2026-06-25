@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider, useCart } from './context/CartContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { SpaceBackground3D } from './components/3d/SpaceBackground3D';
 import { HeroShowcase3D } from './components/3d/HeroShowcase3D';
 import { TailorsTapeRed, DesignBlueprintRed } from './components/design/TailorsTapeAndBlueprint';
@@ -30,7 +31,9 @@ import {
   ChevronRight, 
   Cpu, 
   Sparkles,
-  Info
+  Info,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 function MainAppContent() {
@@ -57,6 +60,7 @@ function MainAppContent() {
   const shopGridRef = useRef<HTMLDivElement>(null);
   const { cart } = useCart();
   const { isAdmin } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   // Dynamic counting animation for the Intro Loader (Disabled by default, but kept for logic safety)
   useEffect(() => {
@@ -154,13 +158,28 @@ function MainAppContent() {
   };
 
   return (
-    <div className="min-h-screen text-white bg-black relative flex flex-col justify-between selection:bg-red-600 selection:text-white antialiased font-sans">
+    <div className={`min-h-screen relative flex flex-col justify-between selection:bg-red-600 selection:text-white antialiased font-sans transition-colors duration-300 ${
+      isDark ? 'text-white bg-black' : 'text-gray-900 bg-white'
+    }`}>
       
       {/* 3D background of slowly descending red cosmic ash */}
-      <SpaceBackground3D />
+      {isDark && <SpaceBackground3D />}
 
       {/* Repeating apparel drafting blueprints, sewing outlines & rulers in red background */}
-      <GarmentBackdropPattern />
+      {isDark && <GarmentBackdropPattern />}
+
+      {/* Floating theme toggle button */}
+      <button
+        onClick={toggleTheme}
+        className={`fixed bottom-6 right-6 z-[100] p-3 rounded-full shadow-lg transition-all duration-300 cursor-pointer hover:scale-110 ${
+          isDark
+            ? 'bg-zinc-800 border border-zinc-700 text-yellow-400 hover:bg-zinc-700'
+            : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+        }`}
+        aria-label="Toggle theme"
+      >
+        {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      </button>
 
       {/* 1. INITIAL CINEMATIC INTRO LOADER OVERLAY */}
       <AnimatePresence>
@@ -386,19 +405,29 @@ function MainAppContent() {
             >
               
               {/* Category selector & Filter bar with rich red-lined framing */}
-              <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 pt-6 px-6 bg-gradient-to-r from-zinc-900/40 via-black/15 to-transparent border border-zinc-900 rounded-2xl overflow-hidden">
+              <div className={`relative flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 pt-6 px-6 bg-gradient-to-r border rounded-2xl overflow-hidden transition-colors duration-300 ${
+                isDark 
+                  ? 'from-zinc-900/40 via-black/15 to-transparent border-zinc-900' 
+                  : 'from-gray-100 via-white/50 to-transparent border-gray-200'
+              }`}>
                 {/* Embedded laser lines inside shop header panel */}
                 <div className="absolute top-0 right-0 w-24 h-[1px] bg-zinc-700" />
                 <div className="absolute top-0 right-0 w-[1px] h-12 bg-zinc-700" />
 
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                    <h2 className="font-mono text-[10px] font-bold text-white tracking-[0.3em] uppercase">
+                    <span className={`h-1.5 w-1.5 rounded-full animate-pulse transition-colors duration-300 ${
+                      isDark ? 'bg-white' : 'bg-red-500'
+                    }`} />
+                    <h2 className={`font-mono text-[10px] font-bold tracking-[0.3em] uppercase transition-colors duration-300 ${
+                      isDark ? 'text-white' : 'text-gray-800'
+                    }`}>
                       COUTURE_GRID_COORD_RED_SYS
                     </h2>
                   </div>
-                  <h3 className="font-sans font-black text-2xl lg:text-3xl tracking-wide text-zinc-100 uppercase">
+                  <h3 className={`font-sans font-black text-2xl lg:text-3xl tracking-wide uppercase transition-colors duration-300 ${
+                    isDark ? 'text-zinc-100' : 'text-gray-900'
+                  }`}>
                     Discover Our Best Sellers
                   </h3>
                 </div>
@@ -409,7 +438,9 @@ function MainAppContent() {
                     className={`px-4 h-8 rounded-full border tracking-widest transition-all cursor-pointer ${
                       selectedCategory === 'all'
                         ? 'bg-red-600 border-red-500 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.45)]'
-                        : 'bg-zinc-950 border-red-950/50 text-zinc-400 hover:text-red-500 hover:border-red-600/50'
+                        : isDark
+                          ? 'bg-zinc-950 border-red-950/50 text-zinc-400 hover:text-red-500 hover:border-red-600/50'
+                          : 'bg-white border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300'
                     }`}
                   >
                     ALL
@@ -421,7 +452,9 @@ function MainAppContent() {
                       className={`px-4 h-8 rounded-full border tracking-widest transition-all cursor-pointer ${
                         selectedCategory === cat.id
                           ? 'bg-red-600 border-red-500 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.45)]'
-                          : 'bg-zinc-950 border-red-950/50 text-zinc-400 hover:text-red-500 hover:border-red-600/50'
+                          : isDark
+                            ? 'bg-zinc-950 border-red-950/50 text-zinc-400 hover:text-red-500 hover:border-red-600/50'
+                            : 'bg-white border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300'
                       }`}
                     >
                       {cat.name}
@@ -441,7 +474,9 @@ function MainAppContent() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {filteredProducts.length === 0 ? (
-                    <div className="col-span-full py-16 text-center text-zinc-650 uppercase font-mono text-xs tracking-wider border border-dashed border-zinc-900 rounded-xl">
+                    <div className={`col-span-full py-16 text-center uppercase font-mono text-xs tracking-wider border border-dashed rounded-xl transition-colors duration-300 ${
+                      isDark ? 'text-zinc-650 border-zinc-900' : 'text-gray-400 border-gray-200'
+                    }`}>
                       No active drops registered under this coordinate segment.
                     </div>
                   ) : (
@@ -462,7 +497,11 @@ function MainAppContent() {
       </AnimatePresence>
 
       {/* 4. IMMERSIVE COMPLIMENTS METRIC BAR (FOOTER BENEFITS) */}
-      <section className="bg-black/30 border-t border-b border-zinc-900/60 py-8 backdrop-blur-md relative z-10">
+      <section className={`border-t border-b py-8 backdrop-blur-md relative z-10 transition-colors duration-300 ${
+        isDark
+          ? 'bg-black/30 border-zinc-900/60'
+          : 'bg-gray-50 border-gray-200'
+      }`}>
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           
           <div className="flex gap-4 items-center">
@@ -470,7 +509,9 @@ function MainAppContent() {
               <Sparkles className="w-4 h-4 animate-pulse" />
             </div>
             <div>
-              <h5 className="font-sans font-bold text-xs tracking-wider text-zinc-200">PREMIUM QUALITY</h5>
+              <h5 className={`font-sans font-bold text-xs tracking-wider transition-colors duration-300 ${
+                isDark ? 'text-zinc-200' : 'text-gray-800'
+              }`}>PREMIUM QUALITY</h5>
               <p className="font-mono text-[10px] text-zinc-500 tracking-wider">BUILT TO LAST FOREVER.</p>
             </div>
           </div>
@@ -480,7 +521,9 @@ function MainAppContent() {
               <Truck className="w-4 h-4" />
             </div>
             <div>
-              <h5 className="font-sans font-bold text-xs tracking-wider text-zinc-200">FAST FREIGHT</h5>
+              <h5 className={`font-sans font-bold text-xs tracking-wider transition-colors duration-300 ${
+                isDark ? 'text-zinc-200' : 'text-gray-800'
+              }`}>FAST FREIGHT</h5>
               <p className="font-mono text-[10px] text-zinc-500 tracking-wider">2-5 BUSINESS DAYS DELIVERY.</p>
             </div>
           </div>
@@ -490,7 +533,9 @@ function MainAppContent() {
               <ArrowRight className="w-4 h-4" />
             </div>
             <div>
-              <h5 className="font-sans font-bold text-xs tracking-wider text-zinc-200">SATISFACTION DECREE</h5>
+              <h5 className={`font-sans font-bold text-xs tracking-wider transition-colors duration-300 ${
+                isDark ? 'text-zinc-200' : 'text-gray-800'
+              }`}>SATISFACTION DECREE</h5>
               <p className="font-mono text-[10px] text-zinc-500 tracking-wider">14 DAYS RISK FREE MATRIX RETURNS.</p>
             </div>
           </div>
@@ -500,7 +545,9 @@ function MainAppContent() {
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <h5 className="font-sans font-bold text-xs tracking-wider text-zinc-200">CYBER SECURITY LOCK</h5>
+              <h5 className={`font-sans font-bold text-xs tracking-wider transition-colors duration-300 ${
+                isDark ? 'text-zinc-200' : 'text-gray-800'
+              }`}>CYBER SECURITY LOCK</h5>
               <p className="font-mono text-[10px] text-zinc-500 tracking-wider">100% PROTECTED DATA WRITES.</p>
             </div>
           </div>
@@ -509,12 +556,18 @@ function MainAppContent() {
       </section>
 
       {/* 5. VOOX BASE LEGALS AND OVERLAYS */}
-      <footer className="bg-black py-8 border-t border-zinc-950 select-none relative z-10">
+      <footer className={`py-8 border-t select-none relative z-10 transition-colors duration-300 ${
+        isDark ? 'bg-black border-zinc-950' : 'bg-gray-50 border-gray-200'
+      }`}>
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="font-mono text-[9px] text-zinc-650 tracking-widest uppercase">
+          <div className={`font-mono text-[9px] tracking-widest uppercase transition-colors duration-300 ${
+            isDark ? 'text-zinc-650' : 'text-gray-500'
+          }`}>
             Designed as an elite high-fashion showroom. All assets loaded.
           </div>
-          <div className="font-mono text-[9px] text-zinc-650 tracking-wider">
+          <div className={`font-mono text-[9px] tracking-wider transition-colors duration-300 ${
+            isDark ? 'text-zinc-650' : 'text-gray-500'
+          }`}>
             © 2026 VOOX CLOTHING SERIES. POWERED BY BLACK & RED ENERGY CYCLES.
           </div>
         </div>
@@ -567,10 +620,12 @@ function MainAppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <MainAppContent />
-      </CartProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <CartProvider>
+          <MainAppContent />
+        </CartProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
