@@ -217,64 +217,43 @@ function saveLocalStorageDB(db: { products: Product[]; categories: Category[]; o
   localStorage.setItem('voox_orders', JSON.stringify(minifiedOrders));
 }
 
-// DATABASE INTERACTION METHODS (REAL SUPABASE + HYBRID DEGRADATION)
+// DATABASE INTERACTION METHODS — INSTANT LOCAL FIRST + BACKGROUND SUPABASE SYNC
 
-export const fetchCategories = async (): Promise<Category[]> => {
-  if (!hasRealSupabase) {
-    return getLocalStorageDB().categories;
-  }
-  try {
-    const { data, error } = await supabase.from('categories').select('*').order('name');
-    if (error) throw error;
-    if (data && data.length >= 5) {
-      return data;
-    }
-    // Fallback to local if Supabase has incomplete data
-    return getLocalStorageDB().categories;
-  } catch (err) {
-    console.warn('Categories from micro-service unavailable; using cache:', err);
-  }
+let _syncPromise: Promise<void> | null = null;
+
+function syncFromSupabase() {
+  if (!hasRealSupabase || _syncPromise) return;
+  _syncPromise = (async () => {
+    try {
+      const [catResult, prodResult] = await Promise.all([
+        supabase.from('categories').select('*').order('name'),
+        supabase.from('products').select('*, product_images(*), product_sizes(*), categories(*)'),
+      ]);
+
+      if (catResult.data && catResult.data.length >= 5) {
+        localStorage.setItem('voox_categories', JSON.stringify(catResult.data));
+      }
+      if (prodResult.data && prodResult.data.length >= 5) {
+        localStorage.setItem('voox_products', JSON.stringify(prodResult.data.map((item: any) => ({
+          ...item,
+          name: item.title,
+          category: item.categories,
+          product_images: item.product_images || [],
+          product_sizes: item.product_sizes || []
+        }))));
+      }
+      window.dispatchEvent(new CustomEvent('voox-sync'));
+    } catch {}
+  })();
+}
+
+export const fetchCategories = (): Category[] => {
+  syncFromSupabase();
   return getLocalStorageDB().categories;
 };
 
-export const fetchProducts = async (): Promise<Product[]> => {
-  if (!hasRealSupabase) {
-    return getLocalStorageDB().products;
-  }
-  try {
-    // Attempt join fetch
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, product_images(*), product_sizes(*), categories(*)');
-    
-    if (error) throw error;
-    if (data && data.length >= 5) {
-      return data.map((item: any) => ({
-        ...item,
-        name: item.title,
-        category: item.categories,
-        product_images: item.product_images || [],
-        product_sizes: item.product_sizes || []
-      })) as Product[];
-    }
-    // If DB has some but not all seed products, merge local fallback + remote
-    if (data && data.length > 0) {
-      const remoteIds = new Set(data.map((p: any) => p.id));
-      const local = getLocalStorageDB().products;
-      const merged = [...data.map((item: any) => ({
-        ...item,
-        name: item.title,
-        category: item.categories,
-        product_images: item.product_images || [],
-        product_sizes: item.product_sizes || []
-      })), ...local.filter(p => !remoteIds.has(p.id))] as Product[];
-      return merged;
-    }
-    // DB is empty — use local storage fallback
-    return getLocalStorageDB().products;
-  } catch (err) {
-    console.warn('Database Products query fallen back:', err);
-  }
+export const fetchProducts = (): Product[] => {
+  syncFromSupabase();
   return getLocalStorageDB().products;
 };
 
