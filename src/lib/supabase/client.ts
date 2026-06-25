@@ -3,8 +3,35 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-// Detect if real Supabase environment variables are provided
 export const hasRealSupabase = Boolean(supabaseUrl && supabaseAnonKey);
+
+let _supabaseOnline: boolean | null = null;
+let _checking = false;
+const _checkCallbacks: Array<(v: boolean) => void> = [];
+
+export function supabaseOnReady(cb: (online: boolean) => void) {
+  if (_supabaseOnline !== null) { cb(_supabaseOnline); return; }
+  _checkCallbacks.push(cb);
+  if (!_checking) checkSupabaseOnline();
+}
+
+async function checkSupabaseOnline() {
+  _checking = true;
+  let online = false;
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 3000);
+    supabase.from('categories').select('id').limit(1).then(({ error }) => {
+      clearTimeout(id);
+      if (!error) online = true;
+    });
+  } catch {}
+  // Wait a moment for the check to complete
+  await new Promise(r => setTimeout(r, 3500));
+  _supabaseOnline = online;
+  _checkCallbacks.forEach(cb => cb(online));
+  _checkCallbacks.length = 0;
+}
 
 // Safe mock client that intercepts all calls to prevent network activities entirely
 const mockSupabaseChain: any = {
@@ -31,30 +58,15 @@ const mockSupabase: any = {
   from: () => mockSupabaseChain
 };
 
-// Initialize real client if configuration is present, otherwise fallback to mock
 export const supabase = hasRealSupabase
   ? createClient(supabaseUrl, supabaseAnonKey)
   : mockSupabase;
 
-/**
- * Diagnostic logger - tests the Supabase connection if configured
- */
 export async function testSupabaseConnection(): Promise<boolean> {
-  if (!hasRealSupabase) {
-    console.log('VOOX operates in pure frontend mode with offline local storage database.');
-    return false;
-  }
+  if (!hasRealSupabase) return false;
   try {
-    const { data, error } = await supabase.from('categories').select('id').limit(1);
-    if (error) {
-      console.error('Supabase connection test failed:', error.message);
-      return false;
-    }
-    console.log('Supabase connection test succeeded!');
-    return true;
-  } catch (err: any) {
-    console.error('Supabase connection test exception:', err);
-    return false;
-  }
+    const { error } = await supabase.from('categories').select('id').limit(1);
+    return !error;
+  } catch { return false; }
 }
 
