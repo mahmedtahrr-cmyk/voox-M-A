@@ -53,32 +53,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
       style={{
         transform: `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
       }}
-      className={`relative rounded-xl border p-4 flex flex-col justify-between transition-all duration-300 pointer-events-auto group content-box cursor-pointer select-none ${
+      className={`relative rounded-2xl border p-5 flex flex-col justify-between transition-all duration-500 pointer-events-auto group cursor-pointer select-none ${
         isDark
-          ? 'bg-black/60 border-zinc-900'
-          : 'bg-white border-gray-200'
+          ? 'bg-[#24201c] border-[#3a342e]'
+          : 'bg-white border-[#e8ddd3]'
       } ${
         hovered 
           ? isDark
-            ? 'border-zinc-700 shadow-[0_0_30px_rgba(255,255,255,0.05)] bg-black/80'
-            : 'border-gray-300 shadow-[0_0_20px_rgba(0,0,0,0.06)] bg-gray-50'
-          : ''
+            ? 'border-[#c4a35a] shadow-[0_0_30px_rgba(196,163,90,0.08)]'
+            : 'border-[#c4a35a] shadow-[0_8px_30px_rgba(160,50,50,0.08)]'
+          : `shadow-sm ${isDark ? 'shadow-black/20' : 'shadow-[#8a8078]/10'}`
       }`}
       onClick={() => onQuickView(product)}
     >
       {/* Top badges: Stock indicator & Brand symbol */}
       <div className="absolute top-6 left-6 z-10 flex items-center gap-2">
         {product.stock < 5 ? (
-          <span className="px-2.5 py-0.5 bg-red-950/70 border border-red-800 text-[8px] font-mono font-bold tracking-widest text-red-500 rounded">
+          <span className="px-2.5 py-0.5 bg-[#a03232]/10 border border-[#a03232]/30 text-[8px] font-sans font-semibold tracking-widest text-[#a03232] rounded-full">
             LIMITED
           </span>
         ) : (
-          <span className={`px-2.5 py-0.5 border text-[8px] font-mono tracking-widest rounded transition-colors duration-300 ${
+          <span className={`px-2.5 py-0.5 border text-[8px] font-sans tracking-widest rounded-full transition-colors duration-300 ${
             isDark
-              ? 'bg-zinc-900/80 border-zinc-800 text-zinc-400'
-              : 'bg-gray-100 border-gray-200 text-gray-500'
+              ? 'border-[#3a342e] text-[#8a8078] bg-[#2a2622]'
+              : 'border-[#e8ddd3] text-[#8a8078] bg-[#faf6f1]'
           }`}>
-            VX_CORE
+            VX CORE
           </span>
         )}
       </div>
@@ -87,11 +87,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
         {product.sku || 'VX-00'}
       </div>
 
-      {/* Main image container with futuristic glowing white frame */}
-      <div className={`w-full h-80 flex items-center justify-center p-4 relative overflow-hidden rounded-lg border-2 shadow-none transition-all duration-300 ${
+      {/* Main image container */}
+      <div className={`w-full h-80 flex items-center justify-center p-4 relative overflow-hidden rounded-xl border-2 transition-all duration-500 ${
         isDark
-          ? 'bg-black/40 border-zinc-900 group-hover:border-white'
-          : 'bg-gray-50 border-gray-200 group-hover:border-gray-400'
+          ? 'bg-[#1c1814] border-[#3a342e] group-hover:border-[#c4a35a]/50'
+          : 'bg-[#faf6f1] border-[#e8ddd3] group-hover:border-[#c4a35a]'
       }`}>
         {/* Real-time 3D Hologram Background system */}
         <ProductCard3DOverlay isHovered={hovered} />
@@ -112,10 +112,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
         <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           <div className="flex gap-1">
             {sizeTags.map((size) => (
-              <span key={size} className={`w-6 h-6 flex items-center justify-center text-[9px] border font-mono rounded font-semibold transition-colors duration-300 ${
+              <span key={size} className={`w-6 h-6 flex items-center justify-center text-[9px] border font-sans rounded-lg font-medium transition-colors duration-300 ${
                 isDark
-                  ? 'bg-black/80 border-zinc-800 text-zinc-300'
-                  : 'bg-white border-gray-200 text-gray-600'
+                  ? 'bg-[#24201c] border-[#3a342e] text-[#a39b93]'
+                  : 'bg-[#faf6f1] border-[#e8ddd3] text-[#8a8078]'
               }`}>
                 {size}
               </span>
@@ -128,18 +128,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
       <div className="mt-4 pt-1 flex flex-col gap-2 relative">
         <div className="flex items-start justify-between gap-1">
           <div>
-            <h3 className={`font-sans font-black text-sm tracking-widest transition-colors duration-300 ${
-              isDark ? 'text-white group-hover:text-zinc-300' : 'text-gray-900 group-hover:text-gray-600'
+            <h3 className={`font-sans font-semibold text-sm tracking-wide transition-colors duration-300 ${
+              isDark ? 'text-[#f0ece6] group-hover:text-[#c4a35a]' : 'text-[#2d2824] group-hover:text-[#a03232]'
             }`}>
               {product.title}
             </h3>
-            <p className="font-mono text-[9px] text-zinc-500 tracking-wider uppercase mt-1">
-              SYSTEM_SUITE: STREETWEAR
+            <p className="font-sans text-[9px] text-[#b5aba3] tracking-wider uppercase mt-1">
+              VOOX COLLECTION
             </p>
           </div>
           <div className="text-right">
-            <p className={`font-mono text-xs font-bold tracking-widest transition-colors duration-300 ${
-              isDark ? 'text-white' : 'text-gray-900'
+            <p className={`font-sans text-sm font-bold tracking-wide transition-colors duration-300 ${
+              isDark ? 'text-[#c4a35a]' : 'text-[#a03232]'
             }`}>
               EGP {product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
@@ -153,10 +153,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
               e.stopPropagation();
               onQuickView(product);
             }}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 border text-[10px] font-mono tracking-widest rounded-lg transition-all ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 border text-[10px] font-sans font-medium tracking-widest rounded-xl transition-all ${
               isDark
-                ? 'bg-black hover:bg-zinc-900 border-zinc-900 text-zinc-400 hover:text-white'
-                : 'bg-white hover:bg-gray-100 border-gray-200 text-gray-500 hover:text-gray-800'
+                ? 'bg-[#24201c] hover:bg-[#2a2622] border-[#3a342e] text-[#a39b93] hover:text-[#f0ece6] hover:border-[#c4a35a]'
+                : 'bg-white hover:bg-[#faf6f1] border-[#e8ddd3] text-[#8a8078] hover:text-[#2d2824] hover:border-[#c4a35a]'
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
@@ -165,7 +165,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
           
           <button
             onClick={handleQuickAdd}
-            className="px-3.5 py-2.5 bg-red-600 hover:bg-red-500 active:scale-95 text-white rounded-lg transition-all flex items-center justify-center cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.2)] hover:shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+            className={`px-3.5 py-2.5 active:scale-95 text-white rounded-xl transition-all flex items-center justify-center cursor-pointer ${
+              isDark
+                ? 'bg-[#c4a35a] hover:bg-[#d4b36a]'
+                : 'bg-[#a03232] hover:bg-[#8a2828]'
+            }`}
+            style={{ boxShadow: isDark ? '0 4px 15px rgba(196,163,90,0.25)' : '0 4px 15px rgba(160,50,50,0.2)' }}
             title="Quick Add in standard size"
           >
             <Plus className="w-4 h-4" />

@@ -16,6 +16,7 @@ import { CheckoutView } from './components/ui/CheckoutView';
 import { AboutModal } from './components/ui/AboutModal';
 import { CollectionsModal } from './components/ui/CollectionsModal';
 import { ProfileModal } from './components/ui/ProfileModal';
+import { AIStylist } from './components/ui/AIStylist';
 import { fetchProducts, fetchCategories, getLocalStorageDB } from './services/db';
 import { Product, Category } from './types';
 import { 
@@ -168,18 +169,8 @@ function MainAppContent() {
       {/* Repeating apparel drafting blueprints, sewing outlines & rulers in red background */}
       {isDark && <GarmentBackdropPattern />}
 
-      {/* Floating theme toggle button */}
-      <button
-        onClick={toggleTheme}
-        className={`fixed bottom-6 right-6 z-[100] p-3 rounded-full shadow-lg transition-all duration-300 cursor-pointer hover:scale-110 ${
-          isDark
-            ? 'bg-zinc-800 border border-zinc-700 text-yellow-400 hover:bg-zinc-700'
-            : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
-        }`}
-        aria-label="Toggle theme"
-      >
-        {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-      </button>
+      {/* AI Stylist — floating fashion assistant */}
+      <AIStylist />
 
       {/* 1. INITIAL CINEMATIC INTRO LOADER OVERLAY */}
       <AnimatePresence>
@@ -316,9 +307,11 @@ function MainAppContent() {
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4, duration: 0.8 }}
-                    className="font-mono text-[10px] font-bold tracking-[0.3em] text-red-500 uppercase flex items-center gap-2 justify-center lg:justify-start"
+                    className={`font-mono text-[10px] font-bold tracking-[0.3em] uppercase flex items-center gap-2 justify-center lg:justify-start ${
+                      isDark ? 'text-[#c4a35a]' : 'text-[#a03232]'
+                    }`}
                   >
-                    <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                    <svg className="w-3.5 h-3.5 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l2 7h7l-5 4 2 7-6-4-6 4 2-7-5-4h7z"/></svg>
                     NEW_DROP: COLLATERAL_SERIES
                   </motion.div>
 
@@ -327,7 +320,9 @@ function MainAppContent() {
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                      className="font-sans font-black text-5xl sm:text-7xl tracking-tighter leading-[0.9] text-white"
+                      className={`font-serif font-bold text-5xl sm:text-7xl tracking-tight leading-[0.9] ${
+                        isDark ? 'text-[#f0ece6]' : 'text-[#2d2824]'
+                      }`}
                     >
                       FEARLESS
                     </motion.h1>
@@ -335,7 +330,9 @@ function MainAppContent() {
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                      className="font-sans font-black text-5xl sm:text-7xl tracking-widest leading-[0.9] text-red-600 outline-text"
+                      className={`font-serif font-bold text-5xl sm:text-7xl tracking-widest leading-[0.9] outline-text ${
+                        isDark ? '' : ''
+                      }`}
                     >
                       M&A VOOX
                     </motion.h1>
@@ -345,7 +342,9 @@ function MainAppContent() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7, duration: 1 }}
-                    className="max-w-md mx-auto lg:mx-0 text-zinc-400 text-xs sm:text-sm font-sans leading-relaxed"
+                    className={`max-w-md mx-auto lg:mx-0 text-xs sm:text-sm font-sans leading-relaxed ${
+                      isDark ? 'text-[#a39b93]' : 'text-[#8a8078]'
+                    }`}
                   >
                     Premium technical streetwear crafted of heavy carbon composite fleece, waterproof shells, and high-spec structural details for those who don't follow trends, they create them.
                   </motion.p>
@@ -358,10 +357,15 @@ function MainAppContent() {
                   >
                     <button
                       onClick={handleScrollToShop}
-                      className="h-12 px-8 bg-red-600 hover:bg-red-500 text-xs font-mono font-bold tracking-widest text-white rounded-xl transition-all shadow-[0_0_15px_rgba(239,68,68,0.2)] flex items-center gap-3.5 mx-auto lg:mx-0 cursor-pointer"
+                      className={`h-12 px-8 text-xs font-mono font-bold tracking-widest text-white rounded-xl transition-all flex items-center gap-3.5 mx-auto lg:mx-0 cursor-pointer ${
+                        isDark
+                          ? 'bg-[#c4a35a] hover:bg-[#d4b36a]'
+                          : 'bg-[#a03232] hover:bg-[#8a2828]'
+                      }`}
+                      style={{ boxShadow: isDark ? '0 4px 20px rgba(196,163,90,0.3)' : '0 4px 20px rgba(160,50,50,0.25)' }}
                     >
-                      EXPLORE_SHOWROOM
-                      <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1" />
+                      EXPLORE SHOWROOM
+                      <ArrowRight className="w-4 h-4 text-white" />
                     </button>
                   </motion.div>
                 </div>
@@ -417,30 +421,32 @@ function MainAppContent() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`h-1.5 w-1.5 rounded-full animate-pulse transition-colors duration-300 ${
-                      isDark ? 'bg-white' : 'bg-red-500'
+                      isDark ? 'bg-[#c4a35a]' : 'bg-[#a03232]'
                     }`} />
-                    <h2 className={`font-mono text-[10px] font-bold tracking-[0.3em] uppercase transition-colors duration-300 ${
-                      isDark ? 'text-white' : 'text-gray-800'
+                    <h2 className={`font-sans text-[10px] font-bold tracking-[0.3em] uppercase transition-colors duration-300 ${
+                      isDark ? 'text-[#c4a35a]' : 'text-[#a03232]'
                     }`}>
-                      COUTURE_GRID_COORD_RED_SYS
+                      VOOX COLLECTION
                     </h2>
                   </div>
-                  <h3 className={`font-sans font-black text-2xl lg:text-3xl tracking-wide uppercase transition-colors duration-300 ${
-                    isDark ? 'text-zinc-100' : 'text-gray-900'
+                  <h3 className={`font-serif font-bold text-3xl lg:text-4xl tracking-wide transition-colors duration-300 ${
+                    isDark ? 'text-[#f0ece6]' : 'text-[#2d2824]'
                   }`}>
-                    Discover Our Best Sellers
+                    أزياء تعكس شخصيتك
                   </h3>
                 </div>
 
-                <div className="flex flex-wrap gap-2.5 font-mono text-[10px] relative z-10">
+                <div className="flex flex-wrap gap-2.5 font-sans text-[11px] relative z-10">
                   <button
                     onClick={() => handleCategorySelect('all')}
-                    className={`px-4 h-8 rounded-full border tracking-widest transition-all cursor-pointer ${
+                    className={`px-5 h-9 rounded-full border tracking-widest transition-all cursor-pointer font-medium ${
                       selectedCategory === 'all'
-                        ? 'bg-red-600 border-red-500 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.45)]'
+                        ? isDark
+                          ? 'bg-[#c4a35a] border-[#c4a35a] text-[#1c1814] font-bold'
+                          : 'bg-[#a03232] border-[#a03232] text-white font-bold'
                         : isDark
-                          ? 'bg-zinc-950 border-red-950/50 text-zinc-400 hover:text-red-500 hover:border-red-600/50'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300'
+                          ? 'border-[#3a342e] text-[#a39b93] hover:border-[#c4a35a] hover:text-[#c4a35a]'
+                          : 'border-[#e8ddd3] text-[#8a8078] hover:border-[#a03232] hover:text-[#a03232]'
                     }`}
                   >
                     ALL
@@ -449,12 +455,14 @@ function MainAppContent() {
                     <button
                       key={cat.id}
                       onClick={() => handleCategorySelect(cat.id)}
-                      className={`px-4 h-8 rounded-full border tracking-widest transition-all cursor-pointer ${
+                      className={`px-5 h-9 rounded-full border tracking-widest transition-all cursor-pointer font-medium ${
                         selectedCategory === cat.id
-                          ? 'bg-red-600 border-red-500 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.45)]'
+                          ? isDark
+                            ? 'bg-[#c4a35a] border-[#c4a35a] text-[#1c1814] font-bold'
+                            : 'bg-[#a03232] border-[#a03232] text-white font-bold'
                           : isDark
-                            ? 'bg-zinc-950 border-red-950/50 text-zinc-400 hover:text-red-500 hover:border-red-600/50'
-                            : 'bg-white border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300'
+                            ? 'border-[#3a342e] text-[#a39b93] hover:border-[#c4a35a] hover:text-[#c4a35a]'
+                            : 'border-[#e8ddd3] text-[#8a8078] hover:border-[#a03232] hover:text-[#a03232]'
                       }`}
                     >
                       {cat.name}
@@ -496,79 +504,75 @@ function MainAppContent() {
         )}
       </AnimatePresence>
 
-      {/* 4. IMMERSIVE COMPLIMENTS METRIC BAR (FOOTER BENEFITS) */}
-      <section className={`border-t border-b py-8 backdrop-blur-md relative z-10 transition-colors duration-300 ${
+      {/* 4. BENEFITS BAR */}
+      <section className={`border-t border-b py-8 relative z-10 transition-colors duration-300 ${
         isDark
-          ? 'bg-black/30 border-zinc-900/60'
-          : 'bg-gray-50 border-gray-200'
+          ? 'bg-[#24201c]/50 border-[#3a342e]'
+          : 'bg-[#f5efe8] border-[#e8ddd3]'
       }`}>
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           
           <div className="flex gap-4 items-center">
-            <div className="p-2 bg-red-950/20 border border-red-900/40 rounded-lg text-red-500">
-              <Sparkles className="w-4 h-4 animate-pulse" />
+            <div className={`p-2.5 rounded-lg ${
+              isDark ? 'bg-[#c4a35a]/10 border border-[#c4a35a]/20 text-[#c4a35a]' : 'bg-[#a03232]/10 border border-[#a03232]/20 text-[#a03232]'
+            }`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M12 2l2 7h7l-5 4 2 7-6-4-6 4 2-7-5-4h7z"/></svg>
             </div>
             <div>
-              <h5 className={`font-sans font-bold text-xs tracking-wider transition-colors duration-300 ${
-                isDark ? 'text-zinc-200' : 'text-gray-800'
-              }`}>PREMIUM QUALITY</h5>
-              <p className="font-mono text-[10px] text-zinc-500 tracking-wider">BUILT TO LAST FOREVER.</p>
+              <h5 className={`font-sans font-semibold text-xs tracking-wider transition-colors duration-300 ${isDark ? 'text-[#f0ece6]' : 'text-[#2d2824]'}`}>PREMIUM QUALITY</h5>
+              <p className={`font-sans text-[10px] tracking-wider ${isDark ? 'text-[#6b635b]' : 'text-[#8a8078]'}`}>BUILT TO LAST FOREVER.</p>
             </div>
           </div>
 
           <div className="flex gap-4 items-center">
-            <div className="p-2 bg-red-950/20 border border-red-900/40 rounded-lg text-red-500">
-              <Truck className="w-4 h-4" />
+            <div className={`p-2.5 rounded-lg ${
+              isDark ? 'bg-[#c4a35a]/10 border border-[#c4a35a]/20 text-[#c4a35a]' : 'bg-[#a03232]/10 border border-[#a03232]/20 text-[#a03232]'
+            }`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             </div>
             <div>
-              <h5 className={`font-sans font-bold text-xs tracking-wider transition-colors duration-300 ${
-                isDark ? 'text-zinc-200' : 'text-gray-800'
-              }`}>FAST FREIGHT</h5>
-              <p className="font-mono text-[10px] text-zinc-500 tracking-wider">2-5 BUSINESS DAYS DELIVERY.</p>
+              <h5 className={`font-sans font-semibold text-xs tracking-wider transition-colors duration-300 ${isDark ? 'text-[#f0ece6]' : 'text-[#2d2824]'}`}>FAST FREIGHT</h5>
+              <p className={`font-sans text-[10px] tracking-wider ${isDark ? 'text-[#6b635b]' : 'text-[#8a8078]'}`}>2-5 BUSINESS DAYS DELIVERY.</p>
             </div>
           </div>
 
           <div className="flex gap-4 items-center">
-            <div className="p-2 bg-red-950/20 border border-red-900/40 rounded-lg text-red-500">
-              <ArrowRight className="w-4 h-4" />
+            <div className={`p-2.5 rounded-lg ${
+              isDark ? 'bg-[#c4a35a]/10 border border-[#c4a35a]/20 text-[#c4a35a]' : 'bg-[#a03232]/10 border border-[#a03232]/20 text-[#a03232]'
+            }`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <div>
-              <h5 className={`font-sans font-bold text-xs tracking-wider transition-colors duration-300 ${
-                isDark ? 'text-zinc-200' : 'text-gray-800'
-              }`}>SATISFACTION DECREE</h5>
-              <p className="font-mono text-[10px] text-zinc-500 tracking-wider">14 DAYS RISK FREE MATRIX RETURNS.</p>
+              <h5 className={`font-sans font-semibold text-xs tracking-wider transition-colors duration-300 ${isDark ? 'text-[#f0ece6]' : 'text-[#2d2824]'}`}>SATISFACTION</h5>
+              <p className={`font-sans text-[10px] tracking-wider ${isDark ? 'text-[#6b635b]' : 'text-[#8a8078]'}`}>14 DAYS RISK FREE RETURNS.</p>
             </div>
           </div>
 
           <div className="flex gap-4 items-center">
-            <div className="p-2 bg-red-950/20 border border-red-900/40 rounded-lg text-red-500">
-              <ShieldCheck className="w-4 h-4" />
+            <div className={`p-2.5 rounded-lg ${
+              isDark ? 'bg-[#c4a35a]/10 border border-[#c4a35a]/20 text-[#c4a35a]' : 'bg-[#a03232]/10 border border-[#a03232]/20 text-[#a03232]'
+            }`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
             <div>
-              <h5 className={`font-sans font-bold text-xs tracking-wider transition-colors duration-300 ${
-                isDark ? 'text-zinc-200' : 'text-gray-800'
-              }`}>CYBER SECURITY LOCK</h5>
-              <p className="font-mono text-[10px] text-zinc-500 tracking-wider">100% PROTECTED DATA WRITES.</p>
+              <h5 className={`font-sans font-semibold text-xs tracking-wider transition-colors duration-300 ${isDark ? 'text-[#f0ece6]' : 'text-[#2d2824]'}`}>SECURE CHECKOUT</h5>
+              <p className={`font-sans text-[10px] tracking-wider ${isDark ? 'text-[#6b635b]' : 'text-[#8a8078]'}`}>100% PROTECTED DATA.</p>
             </div>
           </div>
 
         </div>
       </section>
 
-      {/* 5. VOOX BASE LEGALS AND OVERLAYS */}
-      <footer className={`py-8 border-t select-none relative z-10 transition-colors duration-300 ${
-        isDark ? 'bg-black border-zinc-950' : 'bg-gray-50 border-gray-200'
+      {/* 5. FOOTER */}
+      <footer className={`py-10 border-t select-none relative z-10 transition-colors duration-300 ${
+        isDark ? 'bg-[#14110e] border-[#3a342e]' : 'bg-[#2d2824] border-[#3a342e]'
       }`}>
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className={`font-mono text-[9px] tracking-widest uppercase transition-colors duration-300 ${
-            isDark ? 'text-zinc-650' : 'text-gray-500'
-          }`}>
-            Designed as an elite high-fashion showroom. All assets loaded.
+          <div className="font-sans text-[10px] tracking-wider text-[#8a8078]">
+            <span className="text-[#c4a35a] font-semibold">VOOX</span> — Premium futuristic streetwear archive.
           </div>
-          <div className={`font-mono text-[9px] tracking-wider transition-colors duration-300 ${
-            isDark ? 'text-zinc-650' : 'text-gray-500'
-          }`}>
-            © 2026 VOOX CLOTHING SERIES. POWERED BY BLACK & RED ENERGY CYCLES.
+          <div className="font-sans text-[10px] tracking-wider text-[#6b635b]">
+            © 2026 VOOX CLOTHING SERIES. ALL RIGHTS RESERVED.
           </div>
         </div>
       </footer>
