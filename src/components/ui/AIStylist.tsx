@@ -47,9 +47,10 @@ export const AIStylist: React.FC = () => {
         body: JSON.stringify({ message: text, history }),
       });
       const data = await res.json();
-      setMessages((prev) => [...prev, { role: "stylist", text: data.text || "عذراً، حدث خطأ. حاول مرة أخرى." }]);
-    } catch {
-      setMessages((prev) => [...prev, { role: "stylist", text: "عذراً، تعذر الاتصال بخادم المساعد. تأكد من اتصالك بالإنترنت." }]);
+      setMessages((prev) => [...prev, { role: "stylist", text: data.text || data.error || "عذراً، حدث خطأ غير متوقع." }]);
+    } catch (e) {
+      console.warn("AI Stylist fetch failed:", e);
+      setMessages((prev) => [...prev, { role: "stylist", text: "عذراً، تعذر الوصول لخادم المساعد حالياً. يرجى المحاولة لاحقاً." }]);
     }
     setLoading(false);
   };

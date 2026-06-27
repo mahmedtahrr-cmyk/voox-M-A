@@ -291,6 +291,18 @@ function MainAppContent() {
           >
             {/* HERO MODULE SECTION - Interactive 3D Orbiters */}
             <section className="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden select-none">
+              {/* Background VOOX watermark */}
+              <div
+                className={`absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden ${
+                  isDark ? 'text-[#c4a35a]' : 'text-[#8a6d2b]'
+                }`}
+                style={{ opacity: isDark ? 0.06 : 0.04 }}
+              >
+                <span className="font-serif font-black text-[25vw] sm:text-[20vw] md:text-[18vw] leading-none tracking-tight">
+                  VOOX
+                </span>
+              </div>
+
               {/* Outer Tailor's Red Measuring Tapes (متر احمر خياط في الخلفية) */}
               <TailorsTapeRed position="left" speed="slow" />
               <TailorsTapeRed position="diagonal" speed="medium" />

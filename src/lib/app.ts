@@ -18,6 +18,14 @@ export async function createApp() {
       })
     : null;
 
+  app.get("/api/health", (_req, res) => {
+    res.json({
+      ok: true,
+      hasGeminiKey: !!process.env.GEMINI_API_KEY,
+      envKeys: Object.keys(process.env).filter(k => !k.toLowerCase().includes("key") && !k.toLowerCase().includes("token") && !k.toLowerCase().includes("secret")).sort(),
+    });
+  });
+
   app.post("/api/ai/tryon", async (req, res) => {
     try {
       const { userImage, productTitle, productDescription, gender } = req.body;
