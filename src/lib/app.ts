@@ -1,6 +1,12 @@
 import express from "express";
 import path from "path";
-import { GoogleGenAI, Type } from "@google/genai";
+
+let GoogleGenAI: any, Type: any;
+try {
+  const genai = require("@google/genai");
+  GoogleGenAI = genai.GoogleGenAI;
+  Type = genai.Type;
+} catch { /* Gemini not available */ }
 
 export async function createApp() {
   const app = express();
@@ -19,11 +25,13 @@ export async function createApp() {
     : null;
 
   app.get("/api/health", (_req, res) => {
-    res.json({
-      ok: true,
-      hasGeminiKey: !!process.env.GEMINI_API_KEY,
-      envKeys: Object.keys(process.env).filter(k => !k.toLowerCase().includes("key") && !k.toLowerCase().includes("token") && !k.toLowerCase().includes("secret")).sort(),
-    });
+    try {
+      res.json({
+        ok: true,
+        hasGeminiKey: !!process.env.GEMINI_API_KEY,
+        nodeEnv: process.env.NODE_ENV || "not set",
+      });
+    } catch { res.status(500).json({ ok: false }); }
   });
 
   app.post("/api/ai/tryon", async (req, res) => {
