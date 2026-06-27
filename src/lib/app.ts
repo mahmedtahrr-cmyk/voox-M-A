@@ -1,13 +1,6 @@
 import express from "express";
 import path from "path";
 
-let GoogleGenAI: any, Type: any;
-try {
-  const genai = require("@google/genai");
-  GoogleGenAI = genai.GoogleGenAI;
-  Type = genai.Type;
-} catch { /* Gemini not available */ }
-
 export async function createApp() {
   const app = express();
 
@@ -15,7 +8,12 @@ export async function createApp() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
   const apiKey = process.env.GEMINI_API_KEY;
-  const ai = apiKey
+  let GoogleGenAI: any;
+  try {
+    const genai = await import("@google/genai");
+    GoogleGenAI = genai.GoogleGenAI;
+  } catch { /* Gemini not available */ }
+  const ai = apiKey && GoogleGenAI
     ? new GoogleGenAI({
         apiKey: apiKey,
         httpOptions: {
